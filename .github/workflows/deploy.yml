@@ -1,0 +1,18 @@
+name: fly.io deploy
+on:
+  push:
+    branches:  [ main, master ]
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+  deploy:
+    name: Deploy para o https://fly.io
+    needs: [ build ] # exige que o build passe para fazer o deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy -c fly.toml --remote-only --vm-size shared-cpu-1x
+        env:
+          # flyctl auth token
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
