@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ClienteServiceTest {
     @InjectMocks
     private ClienteService service;
-    
+
     @Mock
     private ClienteRepository repository;
 
