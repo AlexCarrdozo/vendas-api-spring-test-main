@@ -54,6 +54,7 @@ insert into cidade (estado_id, descricao) values (24,'Brasília'); -- Distrito F
 insert into cidade (estado_id, descricao) values (25, 'Teresina'); -- Piauí
 insert into cidade (estado_id, descricao) values (26, 'Fortaleza'); -- Ceará
 insert into cidade (estado_id, descricao) values (27,'Vitória'); -- Espírito Santo
+insert into cidade (estado_id, descricao) values (1,'São Jose do Campos ');
 
 -- CPFs válidos gerados em https://www.4devs.com.br/gerador_de_cpf
 insert into cliente(nome, cpf, cidade_id) values ('Manoel Campos', '33184755053', 4);

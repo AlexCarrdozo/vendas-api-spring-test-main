@@ -1,60 +1,81 @@
 package io.github.manoelcampos.vendas.api.feature.cidade;
 
-import io.github.manoelcampos.vendas.api.feature.AbstractRepositoryTest;
 import io.github.manoelcampos.vendas.api.feature.estado.Estado;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import static org.assertj.core.api.Assertions.*;
+
+import org.assertj.core.util.Preconditions;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 
-class CidadeRepositoryTest extends AbstractRepositoryTest {
+@DataJpaTest
+//@TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
+class CidadeRepositoryTest {
+
     @Autowired
-    private CidadeRepository repository;
-    private Cidade instance;
+    private CidadeRepository cidadeRepository;
 
-    @BeforeEach
-    void setUp() {
-        this.instance = new Cidade("Cidade 1").setEstado(new Estado(1));
-        repository.save(instance);
-    }
+    @Test
+    void findByDescricaoLike() {
+        final  var listaObtida = cidadeRepository.findByDescricaoLike("São %");
+        System.out.println(listaObtida);
 
-    @AfterEach
-    void tearDown() {
-        repository.delete(instance);
+        final var listaEsperada = List.of(new Cidade(13L, "São Luiz"),
+                                          new Cidade(1L, "São Paulo"),
+                                          new Cidade(28L, "São Jose dos Campos"));
+
+        assertThat(listaObtida).size().isEqualTo(listaEsperada.size());
+        assertThat(listaObtida).containsAll(listaEsperada);
+
     }
 
     @Test
-    void findById() {
-        assertNotNull(instance.getId());
-        assertTrue(repository.findById(instance.getId()).isPresent());
+    void deleteByidExcluiCidade() {
+
+        final long id=28;
+        assertThat(cidadeRepository.findById(id)).isPresent();
+        cidadeRepository.deleteById(id);
+        assertThat(cidadeRepository.findById(id)).isEmpty();
+
     }
 
     @Test
-    void deleteById() {
-        assertThrows(DataIntegrityViolationException.class, () -> {
-            repository.deleteById(1L);
-            repository.flush();
-        });
+    void updateCidade() {
+        final long id =28;
+        final var nomeCidadeEsperado = "SÃO JOSÉ DOS CAMPOS";
+        var cidade = getCidade(id);
+        cidade.setDescricao(nomeCidadeEsperado);
+        cidadeRepository.saveAndFlush(cidade);
 
-        //assertConstraintViolation(ex, ConstraintKeys.FK_CIDADE__ESTADO);
+        var cidadeObtida = getCidade(id);
+        assertThat(cidadeObtida.getDescricao()).isEqualTo(nomeCidadeEsperado);
+    }
+
+    private @NotNull Cidade getCidade(long id) {
+        Cidade cidade = cidadeRepository.findById(id).orElseThrow();
+        return cidade;
     }
 
     @Test
-    void findFirstByDescricao() {
-        final var descricao = "Palmas";
-        final List<Cidade> result = repository.findByDescricaoLike(descricao);
-        assertEquals(1, result.size());
-        assertEquals(descricao, result.get(0).getDescricao());
-    }
+    void deleteByidLancaExcecaoViolacaoFK() {
+        final long id = 4;
+        assertThatThrownBy(() -> {
+            cidadeRepository.deleteById(id);
+            cidadeRepository.flush();
+        })
+                .isInstanceOf(DataIntegrityViolationException.class);
 
-    @Test
-    void inserirDescricaoDuplicadaGeraExcecao() {
-        final var cidade = new Cidade(instance.getDescricao()).setEstado(new Estado(1));
-        assertThrows(DataIntegrityViolationException.class, () -> repository.save(cidade));
+
+
+
     }
 }

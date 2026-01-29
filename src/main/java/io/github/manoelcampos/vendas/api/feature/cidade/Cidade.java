@@ -7,16 +7,13 @@ import io.github.manoelcampos.vendas.api.shared.model.AbstractBaseModel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table (uniqueConstraints = {
         @UniqueConstraint(name = ConstraintKeys.UC_CIDADE_DESCRICAO, columnNames = "descricao"),
 })
-@Setter @Getter @NoArgsConstructor @AllArgsConstructor
+@Setter @Getter @NoArgsConstructor @AllArgsConstructor @ToString
 public class Cidade extends AbstractBaseModel {
     @NotNull @NotBlank
     private String descricao;

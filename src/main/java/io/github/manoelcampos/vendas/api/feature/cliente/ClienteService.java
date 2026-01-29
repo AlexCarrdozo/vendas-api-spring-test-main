@@ -12,6 +12,8 @@ public class ClienteService extends AbstractCrudService<Cliente, ClienteReposito
         super(repository);
     }
 
+
+
     /**
      * Localiza um cliente pelo CPF nos formatos ddddddddddd ou ddd.ddd.ddd-dd.
      * @param cpf CPF do cliente
